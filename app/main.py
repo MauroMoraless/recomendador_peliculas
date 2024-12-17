@@ -8,14 +8,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "s
 
 # Importar módulos necesarios
 from scripts.feedback_handler import guardar_feedback
-from recommend import recomendar_pelicula, entrenar_clustering
+from recommend import recomendar_pelicula
 
-# Cargar el dataset reducido
-dataset_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "tmdb_2023_movies_reducido.csv"))
+# Cargar el dataset con clusters (no reentrenar)
+dataset_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "tmdb_2023_movies_clustered.csv"))
 df = pd.read_csv(dataset_path)
-
-# Entrenar el modelo de clustering
-df = entrenar_clustering(df)
 
 # Función para obtener la URL completa del póster
 def obtener_poster_local(poster_path):
@@ -32,7 +29,7 @@ if 'recomendacion' not in st.session_state:
     st.session_state['recomendacion'] = None
 
 # Entrada del título de la película
-titulo_usuario = st.text_input("Ingrese el título de una película:")
+titulo_usuario = st.selectbox("Ingrese el título de una película:", df.title.unique())
 
 if st.button("Recomendar"):
     recomendacion = recomendar_pelicula(titulo_usuario, df)

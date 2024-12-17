@@ -1,47 +1,36 @@
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
-
-def entrenar_clustering(df, n_clusters=10):
-    # Verificar si la columna 'cluster' ya existe
-    if 'cluster' not in df.columns:
-        print("Entrenando modelo de clustering...")
-        
-        # Seleccionar características numéricas
-        features = ['popularity', 'vote_average', 'vote_count']
-        
-        # Eliminar filas con valores nulos en las columnas necesarias
-        df = df.dropna(subset=features)
-        
-        # Escalar las características
-        scaler = StandardScaler()
-        X = scaler.fit_transform(df[features])
-
-        # Aplicar KMeans
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-        df['cluster'] = kmeans.fit_predict(X)
-        print("Clustering completado. Columna 'cluster' añadida.")
-    
-    return df
-
+import pandas as pd
+import random
 
 def recomendar_pelicula(titulo_usuario, df):
+    """
+    Recomienda una película basada en el mismo cluster que la película ingresada.
+
+    Args:
+        titulo_usuario (str): Título de la película ingresada por el usuario.
+        df (DataFrame): Dataset con información de películas y sus clusters.
+
+    Returns:
+        list: Lista con una película recomendada o un mensaje de error.
+    """
     # Buscar la película ingresada por el usuario
     pelicula = df[df['title'].str.lower() == titulo_usuario.lower()]
     
     if pelicula.empty:
-        return "Película no encontrada."
+        return "La película ingresada no se encuentra en el dataset."
     
-    # Obtener el cluster de la película encontrada
-    cluster = pelicula['cluster'].iloc[0]
+    # Obtener el cluster de la película
+    cluster_usuario = pelicula['cluster'].iloc[0]
     
     # Filtrar películas del mismo cluster
-    recomendaciones = df[df['cluster'] == cluster]['title'].tolist()
+    recomendaciones = df[df['cluster'] == cluster_usuario]['title'].tolist()
     
-    # Eliminar la película ingresada de las recomendaciones
-    recomendaciones = [r for r in recomendaciones if r.lower() != titulo_usuario.lower()]
+    # Eliminar la película ingresada de la lista de recomendaciones
+    recomendaciones = [rec for rec in recomendaciones if rec.lower() != titulo_usuario.lower()]
     
     if not recomendaciones:
-        return "No se encontraron recomendaciones en el mismo cluster."
+        return "No se encontraron otras películas en el mismo cluster."
     
-    # Devolver la primera película recomendada
-    return recomendaciones[:1]
+    # Seleccionar aleatoriamente una película del cluster
+    pelicula_recomendada = random.choice(recomendaciones)
+    
+    return [pelicula_recomendada]

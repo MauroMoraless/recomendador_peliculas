@@ -43,13 +43,13 @@ CREATE TABLE usuarios (
     password VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE feedback_recomendaciones (
+CREATE TABLE feedback (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50),
+    user_id INT NOT NULL,
     pelicula_ingresada VARCHAR(255) NOT NULL,
     pelicula_recomendada VARCHAR(255) NOT NULL,
-    feedback ENUM('buena', 'mala') NOT NULL,
-    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    feedback VARCHAR(20) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES usuarios(id)
 );
 ```
 
